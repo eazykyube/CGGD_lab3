@@ -9,9 +9,19 @@ class Renderer
 public:
 	Renderer(UINT width, UINT height) : width(width), height(height), title(L"DX12 renderer"), frame_index(0), rtv_descriptor_size(0)
 	{
+		view_port = CD3DX12_VIEWPORT(0.f, 0.f, width * 1.f, height * 1.f);
+		scissor_rect = CD3DX12_RECT(0, 0, (UINT)width, (UINT)height);
 
-		//eye_position = XMVECTOR({ 0.0f, 1.0f, -5.0f });
-		//projection = XMMatrixPerspectiveFovLH(60.f*XM_PI/180.f, aspect_ratio, 0.001f, 100.f);
+		world = XMMatrixIdentity();
+
+		eye_position = XMVECTOR({ 0.0f, 1.0f, -5.0f });
+		XMVECTOR focus_position = eye_position + XMVECTOR({ sin(angle), 0.f, cos(angle) });
+		XMVECTOR up_direction = XMVECTOR({ 0.0f, 1.0f, 0.0f });
+		view = XMMatrixLookAtLH(eye_position, focus_position, up_direction);
+		aspect_ratio = width * 1.f / (1.f * height);
+		projection = XMMatrixPerspectiveFovLH(60.f*XM_PI/180.f, aspect_ratio, 0.001f, 100.f);
+
+		world_view_projection = world * view * projection;
 	};
 	virtual ~Renderer() {};
 
@@ -34,7 +44,6 @@ protected:
 
 	static const UINT frame_number = 2;
 
-	// Pipeline objects.
 	ComPtr<ID3D12Device> device;
 	ComPtr<ID3D12CommandQueue> command_queue;
 	ComPtr<IDXGISwapChain3> swap_chain;
@@ -50,7 +59,6 @@ protected:
 	CD3DX12_VIEWPORT view_port;
 	CD3DX12_RECT scissor_rect;
 
-	// Resources
 	std::vector<ColorVertex> verteces;
 	ComPtr<ID3D12Resource> vertex_buffer;
 	D3D12_VERTEX_BUFFER_VIEW vertex_buffer_view;
@@ -59,11 +67,10 @@ protected:
 	ComPtr<ID3D12Resource> constant_buffer;
 	UINT8* constant_buffer_data_begin;
 
-	// Synchronization objects.
 	UINT frame_index;
 	HANDLE fence_event;
 	ComPtr<ID3D12Fence> fence;
-	UINT64 fence_values[frame_number];
+	UINT64 fence_values[frame_number] = { 1, 1 };
 
 	float aspect_ratio;
 
@@ -72,7 +79,6 @@ protected:
 	void PopulateCommandList();
 	void WaitForGPU();
 	void MoveToNextFrame();
-
 
 	XMMATRIX world;
 	XMMATRIX view;

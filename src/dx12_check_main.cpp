@@ -4,7 +4,6 @@
 
 bool IsAdapterSupportsDX12(IDXGIAdapter1* pAdapter)
 {
-	// There is no mistake with MinimumFeatureLevel param
 	return SUCCEEDED(D3D12CreateDevice(pAdapter, D3D_FEATURE_LEVEL_11_0, _uuidof(ID3D12Device), nullptr));
 }
 
@@ -42,7 +41,6 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nC
 		std::wcout << L"Exception:";
 		std::wcout << e.get_wstring();
 	}
-
 
 	return 0;
 }
