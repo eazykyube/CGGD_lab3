@@ -1,3 +1,7 @@
+# CGGD_lab3
+
+Implementation of DirectX12 labs. Was done within the Computer Graphics in Game Development course of Innopolis University.
+
 # DirectX12 labs
 
 This repo contains a template for Basics of DirectX 12 labs
